@@ -1,21 +1,15 @@
 const ctrlWrapper = require("../helpers/ctrlWrapper");
-const {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-} = require("../models/contacts");
+const { Contact } = require("../models/contact");
 
 const getAll = async (req, res) => {
-  const allContacts = await listContacts();
+  const allContacts = await Contact.find();
 
   return res.json(allContacts);
 };
 
 const getById = async (req, res) => {
   const { contactId } = req.params;
-  const result = await getContactById(contactId);
+  const result = await Contact.findById(contactId);
 
   if (!result) {
     return res.status(404).json({ message: "Not found" });
@@ -25,14 +19,13 @@ const getById = async (req, res) => {
 };
 
 const addNew = async (req, res) => {
-  const result = await addContact(req.body);
-
+  const result = await Contact.create(req.body);
   return res.status(201).json(result);
 };
 
 const deleteById = async (req, res) => {
   const { contactId } = req.params;
-  const result = await removeContact(contactId);
+  const result = await Contact.findByIdAndRemove(contactId);
 
   if (!result) {
     return res.status(404).json({ message: "Not found" }).end();
@@ -43,7 +36,22 @@ const deleteById = async (req, res) => {
 
 const updateById = async (req, res) => {
   const { contactId } = req.params;
-  const result = await updateContact(contactId, req.body);
+  const result = await Contact.findByIdAndUpdate(contactId, req.body, {
+    new: true,
+  });
+
+  if (!result) {
+    return res.status(404).json({ message: "Not found" }).end();
+  }
+
+  return res.json(result);
+};
+
+const updateFavorite = async (req, res) => {
+  const { contactId } = req.params;
+  const result = await Contact.findByIdAndUpdate(contactId, req.body, {
+    new: true,
+  });
 
   if (!result) {
     return res.status(404).json({ message: "Not found" }).end();
@@ -58,4 +66,5 @@ module.exports = {
   addNew: ctrlWrapper(addNew),
   deleteById: ctrlWrapper(deleteById),
   updateById: ctrlWrapper(updateById),
+  updateFavorite: ctrlWrapper(updateFavorite),
 };
