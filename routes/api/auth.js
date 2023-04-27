@@ -10,9 +10,17 @@ const authenticate = require("../../middlewares/authenticate");
 
 const upload = require("../../middlewares/upload");
 
-const { authSchema, subscriptionScema } = require("../../models/user");
+const {
+  authSchema,
+  subscriptionScema,
+  emailSchema,
+} = require("../../models/user");
 
 router.post("/register", validateBody(authSchema), ctrl.register);
+
+router.get("/verify/:verificationToken", ctrl.verifyEmail);
+
+router.post("/verify", validateBody(emailSchema), ctrl.resendVerifyEmail);
 
 router.post("/login", validateBody(authSchema), ctrl.login);
 
